@@ -3,10 +3,10 @@ This repository contains some python script useful to perform compressed sensing
 
 # Quick Compressed Sensing Presentation  
 A common goal of the engineering field of signal processing is to reconstruct a signalfrom a series of sampling measurements.  Compressed Sensing is a signal processing technique for efficiently acquiring and reconstructing a signal, by finding solutionsto underdetermined linear systems. The problem reduces to solving a linear system of equations. In this repositor, different three different types of measurement matrices are available: 
-1. *Gassian Random Matrices*, which are matrices which entries are sampled independently from a Normal distribution [GaussianRandomMatrix.py](utils/MeasurementsConstruction/GaussianRandomMatrix/GaussianRandomMatrix.py);
-2. *Binary Random Matrices*, which are matrices which entries are sampled independently from a Rademacher distribution [BinaryRandomMatrix.py](utils/MeasurementsConstruction/BinaryRandomMatrix/BinaryRandomMatrix.py);
-3. *Fourier Random Matrices*, which are matrices composed with $m$ random sampled rows of the discrete Fourier transform matrix [FourierRandomMatrix.py](utils/MeasurementsConstruction/FourierRandomMatrix/FourierRandomMatrix.py);
-
+1. *Gassian Random Matrices*, which are matrices which entries are sampled independently from a Normal distribution, see script [GaussianRandomMatrix.py](utils/MeasurementsConstruction/GaussianRandomMatrix/GaussianRandomMatrix.py);
+2. *Binary Random Matrices*, which are matrices which entries are sampled independently from a Rademacher distribution, see script [BinaryRandomMatrix.py](utils/MeasurementsConstruction/BinaryRandomMatrix/BinaryRandomMatrix.py);
+3. *Fourier Random Matrices*, which are matrices composed with $m$ random sampled rows of the discrete Fourier transform matrix, see script [FourierRandomMatrix.py](utils/MeasurementsConstruction/FourierRandomMatrix/FourierRandomMatrix.py);
+This is done with an l1 norm optimization problem. With this repository, it is possible also to reconstruct multidimesional signals such as RGB images. This is perform by the recovery of all the slices, see [RGBRecovery](RGBRecovery).
 
 # Real Application of the Compressed Sensing Theory
 For instance, examples of signal recovery practical applications are in the surface wave tomography and in the magnetic resonance imaging (MRI) fields. The surface wave tomography uses seismic waves produced by earthquakes or explosions for imaging the subsurface of the earth. Seismic data from array sensors are discrete samples of spatially and temporally continuous wavefield. Compressed sensing technique can be applied to reconstruct the original seismic wave from the measurments collected from the sensors. 
