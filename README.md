@@ -2,14 +2,18 @@
 This repository contains some python script useful to perform compressed sensing reconstruction. These script are basics, and useful only for small singals dimension.
 
 # Quick Compressed Sensing Presentation  
-A common goal of the engineering field of signal processing is to reconstruct a signalfrom a series of sampling measurements.  Compressed Sensing is a signal processing technique for efficiently acquiring and reconstructing a signal, by finding solutionsto underdetermined linear systems. The problem reduces to solving a linear system of equations: ![\boldsymbol{y} = A \boldsymbol{x}]
-where the matrix ![A\in\mathbb{C}^{m \times n}] is called \textit{measurment matrix}, ![\boldsymbol{y}\in\mathbb{C}^m] is the *observed data* and ![\boldsymbol{x}\in\C^n] is the \textit{real signal}. 
-In this repositor, different three different types of measurement matrices are available: 
-1. *Gassian Random Matrices*, which are matrices which entries are sampled independently from a Normal distribution [utils/MeasurementsConstruction/GaussianRandomMatrix/GaussianRandomMatrix.py];
-2. *Binary Random Matrices*, which are matrices which entries are sampled independently from a Rademacher distribution [utils/MeasurementsConstruction/BinaryRandomMatrix/BinaryRandomMatrix.py];
-3. *Fourier Random Matrices*, which are matrices composed with $m$ random sampled rows of the discrete Fourier transform matrix [utils/MeasurementsConstruction/FourierRandomMatrix/FourierRandomMatrix.py];
+A common goal of the engineering field of signal processing is to reconstruct a signalfrom a series of sampling measurements.  Compressed Sensing is a signal processing technique for efficiently acquiring and reconstructing a signal, by finding solutionsto underdetermined linear systems. The problem reduces to solving a linear system of equations: 
 
-All these matrices are divided by ![sqrt{m}] in the application. 
+<div class="math">\begin{equation}\boldsymbol{y} = A \boldsymbol{x} \end{equation}</div>
+
+
+where the matrix <div class="math"> A\in\mathbb{C}^{m \times n}</div > is called \textit{measurment matrix}, <div class="math">\boldsymbol{y}\in\mathbb{C}^m </div> is the *observed data* and <div class="math"> \boldsymbol{x}\in\C^n </div> is the \textit{real signal}. 
+In this repositor, different three different types of measurement matrices are available: 
+1. *Gassian Random Matrices*, which are matrices which entries are sampled independently from a Normal distribution [GaussianRandomMatrix.py](utils/MeasurementsConstruction/GaussianRandomMatrix/GaussianRandomMatrix.py);
+2. *Binary Random Matrices*, which are matrices which entries are sampled independently from a Rademacher distribution [BinaryRandomMatrix.py](utils/MeasurementsConstruction/BinaryRandomMatrix/BinaryRandomMatrix.py);
+3. *Fourier Random Matrices*, which are matrices composed with $m$ random sampled rows of the discrete Fourier transform matrix [FourierRandomMatrix.py](utils/MeasurementsConstruction/FourierRandomMatrix/FourierRandomMatrix.py);
+
+All these matrices are divided by <div class="math">sqrt{m}</div> in the application. 
 
 
 # Real Application of the Compressed Sensing Theory
