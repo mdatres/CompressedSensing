@@ -10,9 +10,10 @@ import sys
 
 sys.path.append("../..")
 
-from ...utils.MeasurementsConstruction.FourierRandomMatrix.FourierRandomMatrix import FourierRandomMatrix
-from ...utils.optimizers.optimizersLI import optimizerLI
-from ...utils.scripts.save_rec_as_txt import save_rec_as_txt
+from utils.MeasurementsConstruction.FourierRandomMatrix.FourierRandomMatrix import FourierRandomMatrix
+from utils.optimizers.optimizersLI import optimizerLI
+from utils.scripts.save_rec_as_txt import save_rec_as_txt
+from utils.scripts.audio_plots import pretty_plot, plot_signals
 
 
 def FourierAudioRecover(path, sr, c, lamdathr, Fou, d, varepsilon=0.01, pathtosavetxt='', alg="ECOS", complex=True):
@@ -45,10 +46,16 @@ def FourierAudioRecover(path, sr, c, lamdathr, Fou, d, varepsilon=0.01, pathtosa
             sf.write(pathtosavetxt + 'signalmeas.wav', b.real, sr)
 
     signal = optimizerLI(n, A, b,complex = complex, alg=alg)
+    sign = ifft(signal)
 
     if pathtosavetxt != '':
-        save_rec_as_txt(pathtosavetxt + 'audioRec.txt', signal)
-        librosa.output.write_wav(pathtosavetxt + 'rec.wav', np.array(signal).true, sr)
+        save_rec_as_txt(pathtosavetxt + 'audioRec.txt', sign)
+        librosa.output.write_wav(pathtosavetxt + 'rec.wav', np.array(sign).true, sr)
+        pretty_plot(x, title = 'Original Signal', path=pathtosavetxt + 'Original.jpg')
+        pretty_plot(y, title = 'Original Signal in Fourier Domain', path=pathtosavetxt + 'OriginalInFourier.jpg')
+        pretty_plot(signal, title = 'Reconstructed Signal in Fourier Domain', path=pathtosavetxt + 'RecInFourier.jpg')
+        pretty_plot(sign , title = 'Reconstructed Signal', path=pathtosavetxt + 'Rec.jpg')
+        plot_signals(x, sign, labelx='Original', labely='Recostructed', path=pathtosavetxt + 'RecvsOr.jpg')
 
 def main(): 
     parser = argparse.ArgumentParser()

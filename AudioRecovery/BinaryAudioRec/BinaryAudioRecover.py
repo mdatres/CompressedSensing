@@ -12,6 +12,7 @@ sys.path.append("../..")
 from utils.MeasurementsConstruction.BinaryRandomMatrix.BinaryRandomMatrix import BinaryRandomMatrix
 from utils.optimizers.optimizersLI import optimizerLI
 from utils.scripts.save_rec_as_txt import save_rec_as_txt
+from utils.scripts.audio_plots import pretty_plot, plot_signals
 
 
 def BinaryAudioRecover(path, sr, p, c, lamdathr, Fou, varepsilon=0.01, pathtosavetxt='', alg="ECOS", complex=True):
@@ -44,10 +45,16 @@ def BinaryAudioRecover(path, sr, p, c, lamdathr, Fou, varepsilon=0.01, pathtosav
             sf.write(pathtosavetxt + 'signalmeas.wav', b.real, sr)
 
     signal = optimizerLI(n, A, b,complex = complex, alg=alg)
+    sign = ifft(signal)
 
     if pathtosavetxt != '':
-        save_rec_as_txt(pathtosavetxt + 'audioBinRec.txt', signal)
-        librosa.output.write_wav(pathtosavetxt + 'rec.wav', np.array(signal).real, sr)
+        save_rec_as_txt(pathtosavetxt + 'audioBinRec.txt', sign)
+        librosa.output.write_wav(pathtosavetxt + 'rec.wav', np.array(sign).real, sr)
+        pretty_plot(x, title = 'Original Signal', path=pathtosavetxt + 'Original.jpg')
+        pretty_plot(y, title = 'Original Signal in Fourier Domain', path=pathtosavetxt + 'OriginalInFourier.jpg')
+        pretty_plot(signal, title = 'Reconstructed Signal in Fourier Domain', path=pathtosavetxt + 'RecInFourier.jpg')
+        pretty_plot(sign , title = 'Reconstructed Signal', path=pathtosavetxt + 'Rec.jpg')
+        plot_signals(x, sign, labelx='Original', labely='Recostructed', path=pathtosavetxt + 'RecvsOr.jpg')
 
     print('Done!')
 
