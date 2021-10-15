@@ -6,6 +6,7 @@ from scipy.fft import fft, ifft
 import matplotlib.pyplot as plt
 import cvxpy as cvx
 import argparse
+import scipy.io.wavfile
 import sys
 sys.path.append("../..")
 from utils.MeasurementsConstruction.GaussianRandomMatrix.GaussianRandomMatrix import GaussianRandomMatrix
@@ -23,7 +24,6 @@ def GaussianAudioRecover(path, sr,  c, lamdathr, Fou, varepsilon=0.01, pathtosav
     if Fou:
         lamda=0
         y = fft(x)
-        plt.plot(y)
         lamda =(y > lamdathr).sum()
         print('The sparsity level is:   '+ str(lamda))
     else:
@@ -35,12 +35,13 @@ def GaussianAudioRecover(path, sr,  c, lamdathr, Fou, varepsilon=0.01, pathtosav
     
     if Fou:
         b = A.dot(y)
+        bsave = ifft(b)
         if pathtosavetxt != '': 
-            sf.write(pathtosavetxt + 'signalmeas.wav', b.real, sr)
+            scipy.io.wavfile.write(pathtosavetxt +'signalmeas.wav', sr, bsave.real*100)
     else: 
         b = A.dot(x)
         if pathtosavetxt != '': 
-            sf.write(pathtosavetxt + 'signalmeas.wav', b.real, sr)
+            scipy.io.wavfile.write(pathtosavetxt +'signalmeas.wav', sr, b.real*100)
 
     signal = optimizerLI(n, A, b,complex = complex, alg=alg)
 
@@ -48,7 +49,7 @@ def GaussianAudioRecover(path, sr,  c, lamdathr, Fou, varepsilon=0.01, pathtosav
 
     if pathtosavetxt != '':
         save_rec_as_txt(pathtosavetxt + 'audioBinRec.txt', sign)
-        sf.write(pathtosavetxt + 'rec.wav', np.array(signal).real, sr)
+        scipy.io.wavfile.write(pathtosavetxt +'rec.wav', sr, np.array(sign).real*100)
         pretty_plot(x, title = 'Original Signal', path=pathtosavetxt + 'Original.jpg')
         pretty_plot(y, title = 'Original Signal in Fourier Domain', path=pathtosavetxt + 'OriginalInFourier.jpg')
         pretty_plot(signal, title = 'Reconstructed Signal in Fourier Domain', path=pathtosavetxt + 'RecInFourier.jpg')

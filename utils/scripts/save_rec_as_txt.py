@@ -1,3 +1,5 @@
+import numpy as np
+
 def save_rec_as_txt(name, signal):
     with open(name, 'w') as f:
         # create the csv writer

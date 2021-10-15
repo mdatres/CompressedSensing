@@ -16,12 +16,12 @@ def create_measurements(F, lamda, m, n):
 def DFT_matrix(N):
     i, j = np.meshgrid(np.arange(N), np.arange(N))
     omega = np.exp( - 2 * math.pi * 1J / N )
-    W = np.power( omega, i * j ) / math.sqrt(N)
+    W = np.power( omega, i * j ) 
     return W
 
 def FourierRandomMatrix(n, lamda, c, varepsilon): 
     DFT = DFT_matrix(n)
     m  = int(c*lamda*math.log(n)*math.log(1/varepsilon))
     print("The number of measurements is:   " + str(m))
-    A = create_measurements(F,lamda, m, n )
+    A = create_measurements(DFT,lamda, m, n )
     return A

@@ -18,7 +18,7 @@ from utils.MeasurementsConstruction.BinaryRandomMatrix.BinaryRandomMatrix import
 from utils.optimizers.optimizersLI import optimizerLI
 
 
-def BinaryRecoverRGB(imagepath, c, lamda, Fou, d, p=0.5, varepsilon=0.01, pathtosavetxt='', pathtosave= '.', alg="ECOS", complex=True):
+def BinaryRecoverRGB(imagepath, c, lamdathr, Fou, p=0.5, varepsilon=0.01, pathtosavetxt='', alg="ECOS", complex=True):
 
     x = Image.open(imagepath).convert('RGB')
     width = x.size[0]
@@ -34,18 +34,18 @@ def BinaryRecoverRGB(imagepath, c, lamda, Fou, d, p=0.5, varepsilon=0.01, pathto
     if Fou:
         lamdared = 0
         yred = fft(red)
-        lamdared = (yred > lamda).sum()
+        lamdared = (yred > lamdathr).sum()
         lamdagreen = 0
         ygreen = fft(green)
-        lamdagreen = (ygreen > lamda).sum()
+        lamdagreen = (ygreen > lamdathr).sum()
         lamdablue = 0
         yblue = fft(blue)
-        lamdablue = (yblue > lamda).sum()
+        lamdablue = (yblue > lamdathr).sum()
         BinaryRed = BinaryRandomMatrix(n, p, lamdared, c, varepsilon)
         BinaryGreen = BinaryRandomMatrix(n, p, lamdagreen, c, varepsilon)
         BinaryBlue = BinaryRandomMatrix(n, p, lamdablue, c, varepsilon)
     else:
-        Lamda = (x > lamda).sum()
+        Lamda = (x > lamdathr).sum()
         Binary = RGBBinaryRandomMatrix(n, p,  Lamda, c, varepsilon)
         BinaryRed = Binary[0]
         BinaryGreen = Binary[1]
@@ -89,7 +89,7 @@ def BinaryRecoverRGB(imagepath, c, lamda, Fou, d, p=0.5, varepsilon=0.01, pathto
         recImage = np.stack((imageRed.astype('uint8'), imageGreen.astype(
             'uint8'), imageBlue.astype('uint8')), axis=2)
 
-    plt.imsave(pathtosave, recImage)
+    plt.imsave(pathtosavetxt + 'rec.jpg', recImage)
     print('Done')
 
 def main(): 
@@ -99,7 +99,7 @@ def main():
     parser.add_argument("--c", type=float, help="constant for measurements")
     parser.add_argument("--lamda", type=int, help="level below which we consider zero")
     parser.add_argument("--Fou", type=bool, default = True, help="apply Fast Fourier transform and recover in Fourier domain")
-    parser.add_argument("--path-to-save", type = str, default='.', help="path to save the reconstructed image")
+    
     parser.add_argument("--path-to-txt", type = str, default = '', help="path to save the reconstructed image")
     parser.add_argument("--varepsilon", type=float, default = 0.01, help="accuracy 1 - varepsilon")
     parser.add_argument("--alg", type=bool, default= "ECOS", help="algorithm for l1 minimization")

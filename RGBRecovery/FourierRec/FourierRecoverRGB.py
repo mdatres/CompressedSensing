@@ -7,17 +7,18 @@ import cmath as math
 import cvxpy as cvx
 from scipy.fft import fft, ifft
 import argparse
-
+import sys
+sys.path.append("../..")
 # Import from my script 
 
-from ...utils.MeasurementsConstruction.FourierRandomMatrix.RGBFourierRandomMatrix import RGBFourierRandomMatrix
-from ...utils.scripts.save_rec_as_txt import save_rec_as_txt
-from ...utils.MeasurementsConstruction.FourierRandomMatrix.FourierRandomMatrix import FourierRandomMatrix
-from ...utils.optimizers.optimizersLI import optimizersLI
+from utils.MeasurementsConstruction.FourierRandomMatrix.RGBFourierRandomMatrix import RGBFourierRandomMatrix
+from utils.scripts.save_rec_as_txt import save_rec_as_txt
+from utils.MeasurementsConstruction.FourierRandomMatrix.FourierRandomMatrix import FourierRandomMatrix
+from utils.optimizers.optimizersLI import optimizerLI
 
 
 
-def FourierRecoverRGB(imagepath, c, lamda, fft,  varepsilon=0.01, pathtosavetxt='', pathtosave = '.', alg="ECOS", complex=True): 
+def FourierRecoverRGB(imagepath, c, lamdathr, fft,  varepsilon=0.01, pathtosavetxt='', alg="ECOS", complex=True): 
 
     
     x = Image.open(imagepath).convert('RGB')
@@ -35,18 +36,18 @@ def FourierRecoverRGB(imagepath, c, lamda, fft,  varepsilon=0.01, pathtosavetxt=
     if fft:
         lamdared = 0
         yred = fft(red)
-        lamdared =(yred > lamda).sum()
+        lamdared =(yred > lamdathr).sum()
         lamdagreen=0
         ygreen = fft(green)
-        lamdagreen =(ygreen > lamda).sum()
+        lamdagreen =(ygreen > lamdathr).sum()
         lamdablue=0
         yblue = fft(blue)
-        lamdablue =(yblue > lamda).sum()
+        lamdablue =(yblue > lamdathr).sum()
         FourRed = FourierRandomMatrix(n, lamdared, c, varepsilon)
         FourGreen = FourierRandomMatrix(n, lamdagreen, c, varepsilon)
         FourBlue = FourierRandomMatrix(n, lamdablue, c, varepsilon)
     else:
-        Lamda = (x > lamda).sum()
+        Lamda = (x > lamdathr).sum()
         Fou = RGBFourierRandomMatrix(n, Lamda, c, varepsilon)
         FourRed = Fou[0]
         FourGreen = Fou[1]
@@ -61,23 +62,23 @@ def FourierRecoverRGB(imagepath, c, lamda, fft,  varepsilon=0.01, pathtosavetxt=
         bgreen = FourGreen.dot(green)
         bblue = FourBlue.dot(blue)
 
-    signalBlue = optimizersLI(n, FourBlue, bblue,complex = complex, alg=alg)
-    signalRed = optimizersLI(n, FourRed, bred,complex = complex, alg=alg)
-    signalGreen = optimizersLI(n, FourGreen, bgreen,complex = complex, alg=alg)
+    signalBlue = optimizerLI(n, FourBlue, bblue,complex = complex, alg=alg)
+    signalRed = optimizerLI(n, FourRed, bred,complex = complex, alg=alg)
+    signalGreen = optimizerLI(n, FourGreen, bgreen,complex = complex, alg=alg)
 
     if pathtosavetxt != '':
-        save_rec_as_txt(pathtosavetxt + 'ImmFouRed.txt', singalRed)
-        save_rec_as_txt(pathtosavetxt + 'ImmFouGreen.txt', singalGreen)
-        save_rec_as_txt(pathtosavetxt+ 'ImmFouBlue.txt', singalBlue)
+        save_rec_as_txt(pathtosavetxt + 'ImmFouRed.txt', signalRed)
+        save_rec_as_txt(pathtosavetxt + 'ImmFouGreen.txt', signalGreen)
+        save_rec_as_txt(pathtosavetxt+ 'ImmFouBlue.txt', signalBlue)
 
     if fft: 
-        imageGreen = ifft(singalGreen).real
+        imageGreen = ifft(signalGreen).real
         imageGreen = np.reshape(imageGreen, (width,height))
 
-        imageRed = ifft(singalRed).real
+        imageRed = ifft(signalRed).real
         imageRed = np.reshape(imageRed, (width,height))
 
-        imageBlue = ifft(singalBlue).real
+        imageBlue = ifft(signalBlue).real
         imageBlue = np.reshape(imageBlue, (width,height))
         recImage = np.stack((imageRed.astype('uint8'), imageGreen.astype('uint8'), imageBlue.astype('uint8')), axis=2)
     else:
@@ -86,16 +87,15 @@ def FourierRecoverRGB(imagepath, c, lamda, fft,  varepsilon=0.01, pathtosavetxt=
         imageBlue = np.reshape(signalBlue, (width,height))
         recImage = np.stack((imageRed.astype('uint8'), imageGreen.astype('uint8'), imageBlue.astype('uint8')), axis=2)
         
-    plt.imsave(pathtosave, recImage)
+    plt.imsave(pathtosavetxt, recImage)
     print('Done')
 
 def main(): 
     parser = argparse.ArgumentParser()
     parser.add_argument("--path-to-image", type=str,  help="path to image")
     parser.add_argument("--c", type=float, help="constant for measurements")
-    parser.add_argument("--lamda", type=int, help="level below which we consider zero")
-    parser.add_argument("--fft", type=bool, default = True, help="apply Fast Fourier transform and recover in Fourier domain")
-    parser.add_argument("--path-to-save", type = str, default='.', help="path to save the reconstructed image")
+    parser.add_argument("--lamdathr", type=int, help="level below which we consider zero")
+    parser.add_argument("--Fou", type=bool, default = True, help="apply Fast Fourier transform and recover in Fourier domain")
     parser.add_argument("--path-to-txt", type = str, default = '', help="path to save the reconstructed image")
     parser.add_argument("--varepsilon", type=float, default = 0.01, help="accuracy 1 - varepsilon")
     parser.add_argument("--alg", type=bool, default= "ECOS", help="algorithm for l1 minimization")
@@ -103,6 +103,6 @@ def main():
 
     args = parser.parse_args()
 
-    FourierRecoverRGB(imagepath = args.path_to_image, c = args.c, lamda = args.lamda, Fou = args.Fou, pathtosavetxt = args.path-to-txt, pathtosave= args.path-to-save, varepsilon= args.varepsilon, alg = args.val, complex = args.complex)
+    FourierRecoverRGB(imagepath = args.path_to_image, c = args.c, lamda = args.lamdathr, Fou = args.Fou, pathtosavetxt = args.path-to-txt, varepsilon= args.varepsilon, alg = args.alg, complex = args.complex)
 
 main()
