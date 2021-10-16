@@ -3,6 +3,8 @@ import numpy as np
 import soundfile as sf
 import cmath as math
 from scipy.fft import fft, ifft
+import os
+import matplotlib
 import matplotlib.pyplot as plt
 import cvxpy as cvx
 import argparse
@@ -16,7 +18,10 @@ from utils.optimizers.optimizersLI import optimizerLI
 from utils.scripts.save_rec_as_txt import save_rec_as_txt
 from utils.scripts.audio_plots import pretty_plot, plot_signals
 
-
+if os.environ.get('DISPLAY','') == '':
+    print('no display found. Using non-interactive Agg backend')
+    matplotlib.use('Agg')
+    
 def FourierAudioRecover(path, sr, c, lamdathr, Fou,  varepsilon=0.01, pathtosavetxt='', alg="ECOS_BB", complex=True):
     x, sr = librosa.load(path, sr= sr)
     n = len(x)

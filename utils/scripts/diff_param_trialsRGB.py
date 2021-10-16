@@ -1,5 +1,7 @@
 from os import altsep
 from PIL import Image
+import os
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np 
 import csv
@@ -9,10 +11,15 @@ from scipy.fft import fft, ifft
 import argparse
 import sys
 from multiprocessing import Pool
-from multiprocessing import Pool
+import multiprocessing
+import multiprocessing.pool
 sys.path.append("../..")
 # Import from my script 
 
+if os.environ.get('DISPLAY','') == '':
+    print('no display found. Using non-interactive Agg backend')
+    matplotlib.use('Agg')
+    
 from utils.MeasurementsConstruction.GaussianRandomMatrix.RGBGaussianRandomMatrix import RGBGaussianRandomMatrix
 from utils.MeasurementsConstruction.FourierRandomMatrix.RGBFourierRandomMatrix import RGBFourierRandomMatrix
 from utils.MeasurementsConstruction.BinaryRandomMatrix.RGBBinaryRandomMatrix import RGBBinaryRandomMatrix
@@ -25,6 +32,25 @@ from utils.MeasurementsConstruction.BinaryRandomMatrix.BinaryRandomMatrix import
 from utils.MeasurementsConstruction.FourierRandomMatrix.FourierRandomMatrix import FourierRandomMatrix
 from utils.optimizers.optimizersLI import optimizerLI
 
+class NoDaemonProcess(multiprocessing.Process):
+    @property
+    def daemon(self):
+        return False
+
+    @daemon.setter
+    def daemon(self, value):
+        pass
+
+
+class NoDaemonContext(type(multiprocessing.get_context())):
+    Process = NoDaemonProcess
+
+
+class MyPool(multiprocessing.pool.Pool):
+    def __init__(self, *args, **kwargs):
+        kwargs['context'] = NoDaemonContext()
+        super(MyPool, self).__init__(*args, **kwargs)
+
 def different_trialsRGB(path, type, stop, cvalues, lamdathr, Fou=True,ncorechannels=1, ncore=1, varepsilon=0.01, pathtosavetxt='', alg="ECOS_BB", complex=True): 
 
     cs = np.linspace(0.5, stop, cvalues)
@@ -33,23 +59,23 @@ def different_trialsRGB(path, type, stop, cvalues, lamdathr, Fou=True,ncorechann
         params.append((path, c, lamdathr, Fou, ncorechannels, varepsilon, pathtosavetxt, alg, complex))
 
     if type == 'Fourier':
-        pool = Pool(ncore)
+        pool = MyPool(ncore)
         pool.starmap(FourierRecoverRGB, params)
     
     if type == 'Binary':
-        pool = Pool(ncore)
+        pool = MyPool(ncore)
         pool.starmap(BinaryRecoverRGB, params)
 
     if type == 'Gaussian':
-        pool = Pool(ncore)
+        pool = MyPool(ncore)
         pool.starmap(GaussianRecoverRGB, params)
 
 def main(): 
     parser = argparse.ArgumentParser()
     parser.add_argument("--path", type=str,  help="path to sound")
     parser.add_argument("--type", type=str, help="type of measurement matrix.(Choose between Fourier, Binary or Gaussian)")
-    parser.add_argument("--stop", type=float, help="maximum value of c")
-    parser.add_argument("--cvalues", type=float, help="number of trials to prove")
+    parser.add_argument("--stop", type=int, help="maximum value of c")
+    parser.add_argument("--cvalues", type=int, help="number of trials to prove")
     parser.add_argument("--lamdathr", type=int, help="level below which we consider zero")
     parser.add_argument("--Fou", type=bool, default = True, help="apply Fast Fourier transform and recover in Fourier domain")
     parser.add_argument("--ncorechannels", type=int, default=1, help="number of cores inside a type of reconstruction")
@@ -61,6 +87,6 @@ def main():
 
     args = parser.parse_args()
 
-    different_trialsRGB(path = args.path, type = args.type, stop = args.stop, cvalues = args.cvalues, ncore = args.ncore, c = args.c, lamdathr = args.lamdathr, ncorechannels = args.ncorechannels, Fou = args.Fou, pathtosavetxt = args.pathtotxt, varepsilon= args.varepsilon, alg = args.alg, complex = args.complex)
+    different_trialsRGB(path = args.path, type = args.type, stop = args.stop, cvalues = args.cvalues, ncore = args.ncore, lamdathr = args.lamdathr, ncorechannels = args.ncorechannels, Fou = args.Fou, pathtosavetxt = args.pathtotxt, varepsilon= args.varepsilon, alg = args.alg, complex = args.complex)
 
 main()

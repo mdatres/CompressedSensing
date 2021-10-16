@@ -1,5 +1,7 @@
 from os import altsep
 from PIL import Image
+import os
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np 
 import csv
@@ -19,6 +21,10 @@ from utils.MeasurementsConstruction.GaussianRandomMatrix.GaussianRandomMatrix im
 from utils.MeasurementsConstruction.BinaryRandomMatrix.BinaryRandomMatrix import BinaryRandomMatrix
 from utils.MeasurementsConstruction.FourierRandomMatrix.FourierRandomMatrix import FourierRandomMatrix
 from utils.optimizers.optimizersLI import optimizerLI
+
+if os.environ.get('DISPLAY','') == '':
+    print('no display found. Using non-interactive Agg backend')
+    matplotlib.use('Agg')
 
 def different_trialsAudio(path, type, stop, cvalues, sr, lamdathr, Fou=True, ncore=1, varepsilon=0.01, pathtosavetxt='', alg="ECOS_BB", complex=True): 
 

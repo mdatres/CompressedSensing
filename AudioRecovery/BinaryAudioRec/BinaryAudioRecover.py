@@ -3,6 +3,8 @@ import soundfile as sf
 import numpy as np
 import cmath as math
 from scipy.fft import fft, ifft
+import os
+import matplotlib
 import matplotlib.pyplot as plt
 import cvxpy as cvx
 import argparse
@@ -16,6 +18,11 @@ from utils.scripts.save_rec_as_txt import save_rec_as_txt
 from utils.scripts.audio_plots import pretty_plot, plot_signals
 
 
+
+if os.environ.get('DISPLAY','') == '':
+    print('no display found. Using non-interactive Agg backend')
+    matplotlib.use('Agg')
+    
 def BinaryAudioRecover(path, sr,  c, lamdathr, Fou, p=0.5, varepsilon=0.01, pathtosavetxt='', alg="ECOS", complex=True):
     x, sr = librosa.load(path, sr= sr)
     n = len(x)
