@@ -68,7 +68,7 @@ def main():
     parser.add_argument("--p", type=float, default= 0.5, help="probability of success of Bernoulli")
     parser.add_argument("--path-to-txt", type = str, default = '', help="path to save the reconstructed image")
     parser.add_argument("--varepsilon", type=float, default = 0.01, help="accuracy 1 - varepsilon")
-    parser.add_argument("--alg", type=bool, default= "ECOS", help="algorithm for l1 minimization")
+    parser.add_argument("--alg", type=str, default= "ECOS", help="algorithm for l1 minimization")
     parser.add_argument("--complex", type=bool, default=True, help="work in complex vector space")
 
     args = parser.parse_args()

@@ -20,7 +20,7 @@ from utils.MeasurementsConstruction.BinaryRandomMatrix.BinaryRandomMatrix import
 from utils.MeasurementsConstruction.FourierRandomMatrix.FourierRandomMatrix import FourierRandomMatrix
 from utils.optimizers.optimizersLI import optimizerLI
 
-def different_trialsAudio(path, type, stop, cvalues, sr, lamdathr, Fou=True, ncore=1, varepsilon=0.01, pathtosavetxt='', alg="ECOS", complex=True): 
+def different_trialsAudio(path, type, stop, cvalues, sr, lamdathr, Fou=True, ncore=1, varepsilon=0.01, pathtosavetxt='', alg="ECOS_BB", complex=True): 
 
     cs = np.linspace(0.5, stop, cvalues)
     params = []
@@ -53,7 +53,7 @@ def main():
     parser1.add_argument("--ncore", type=int, default=1, help="number of cores")
     parser1.add_argument("--pathtotxt", type = str, default = '', help="path to save the reconstructed image")
     parser1.add_argument("--varepsilon", type=float, default = 0.01, help="accuracy 1 - varepsilon")
-    parser1.add_argument("--alg", type=bool, default= "ECOS", help="algorithm for l1 minimization")
+    parser1.add_argument("--alg", type=str, default= "ECOS_BB", help="algorithm for l1 minimization")
     parser1.add_argument("--complex", type=bool, default=True, help="work in complex vector space")
 
     args1 = parser1.parse_args()

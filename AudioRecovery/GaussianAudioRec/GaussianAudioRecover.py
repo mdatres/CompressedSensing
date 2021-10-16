@@ -16,7 +16,7 @@ from utils.scripts.audio_plots import pretty_plot, plot_signals
 
 
 
-def GaussianAudioRecover(path, sr,  c, lamdathr, Fou, varepsilon=0.01, pathtosavetxt='', alg="ECOS", complex=True):
+def GaussianAudioRecover(path, sr,  c, lamdathr, Fou, varepsilon=0.01, pathtosavetxt='', alg="ECOS_BB", complex=True):
     x, sr = librosa.load(path, sr= sr)
     n = len(x)
     print('The lenght of the signal is:     ' + str(n))
@@ -67,7 +67,7 @@ def main():
     parser.add_argument("--Fou", type=bool, default = True, help="apply Fast Fourier transform and recover in Fourier domain")
     parser.add_argument("--path-to-txt", type = str, default = '', help="path to save the reconstructed image")
     parser.add_argument("--varepsilon", type=float, default = 0.01, help="accuracy 1 - varepsilon")
-    parser.add_argument("--alg", type=bool, default= "ECOS", help="algorithm for l1 minimization")
+    parser.add_argument("--alg", type=str, default= "ECOS_BB", help="algorithm for l1 minimization")
     parser.add_argument("--complex", type=bool, default=True, help="work in complex vector space")
 
     args = parser.parse_args()

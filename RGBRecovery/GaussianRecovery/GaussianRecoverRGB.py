@@ -18,7 +18,7 @@ from utils.optimizers.optimizersLI import optimizerLI
 
 
 
-def GaussianRecoverRGB(imagepath, c, lamdathr, Fou,  ncore=1, varepsilon=0.01, pathtosavetxt='', alg="ECOS", complex=True): 
+def GaussianRecoverRGB(imagepath, c, lamdathr, Fou,  ncore=1, varepsilon=0.01, pathtosavetxt='', alg="ECOS_BB", complex=True): 
 
     
     x = Image.open(imagepath).convert('RGB')
@@ -104,7 +104,7 @@ def main():
     parser.add_argument("--pathtotxt", type = str, default = '', help="path to save the reconstructed image")
     parser.add_argument("--ncore", type=int, defualt=1, help="constant for measurements")
     parser.add_argument("--varepsilon", type=float, default = 0.01, help="accuracy 1 - varepsilon")
-    parser.add_argument("--alg", type=bool, default= "ECOS", help="algorithm for l1 minimization")
+    parser.add_argument("--alg", type=str, default= "ECOS_BB", help="algorithm for l1 minimization")
     parser.add_argument("--complex", type=bool, default=True, help="work in complex vector space")
 
     args = parser.parse_args()
