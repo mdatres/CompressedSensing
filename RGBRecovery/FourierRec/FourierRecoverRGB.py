@@ -8,6 +8,7 @@ import cvxpy as cvx
 from scipy.fft import fft, ifft
 import argparse
 import sys
+from multiprocessing import Pool
 sys.path.append("../..")
 # Import from my script 
 
@@ -18,7 +19,7 @@ from utils.optimizers.optimizersLI import optimizerLI
 
 
 
-def FourierRecoverRGB(imagepath, c, lamdathr, fft,  varepsilon=0.01, pathtosavetxt='', alg="ECOS", complex=True): 
+def FourierRecoverRGB(imagepath, c, lamdathr, Fou=True, ncore=1, varepsilon=0.01, pathtosavetxt='', alg="ECOS", complex=True): 
 
     
     x = Image.open(imagepath).convert('RGB')
@@ -33,7 +34,7 @@ def FourierRecoverRGB(imagepath, c, lamdathr, fft,  varepsilon=0.01, pathtosavet
     blue = xarr[:,:,2].flatten(order='C')
 
 
-    if fft:
+    if Fou:
         lamdared = 0
         yred = fft(red)
         lamdared =(yred > lamdathr).sum()
@@ -53,7 +54,7 @@ def FourierRecoverRGB(imagepath, c, lamdathr, fft,  varepsilon=0.01, pathtosavet
         FourGreen = Fou[1]
         FourBlue = Fou[2]
     
-    if fft:  
+    if Fou:  
         bred = FourRed.dot(yred)
         bgreen = FourGreen.dot(ygreen)
         bblue = FourBlue.dot(yblue)
@@ -61,48 +62,56 @@ def FourierRecoverRGB(imagepath, c, lamdathr, fft,  varepsilon=0.01, pathtosavet
         bred = FourRed.dot(red)
         bgreen = FourGreen.dot(green)
         bblue = FourBlue.dot(blue)
-
-    signalBlue = optimizerLI(n, FourBlue, bblue,complex = complex, alg=alg)
-    signalRed = optimizerLI(n, FourRed, bred,complex = complex, alg=alg)
-    signalGreen = optimizerLI(n, FourGreen, bgreen,complex = complex, alg=alg)
+    
+    param = [(n, FourBlue, bblue, complex, alg), (n, FourRed, bred, complex, alg), (n, FourGreen, bgreen, complex, alg) ]
+    pool = Pool(ncore)
+    result = pool.starmap(optimizerLI, param)
+    signalBlue = result[0]
+    signalRed = result[1]
+    signalGreen = result[2]
+    #signalBlue = optimizerLI(n, FourBlue, bblue,complex = complex, alg=alg)
+    #signalRed = optimizerLI(n, FourRed, bred,complex = complex, alg=alg)
+    #signalGreen = optimizerLI(n, FourGreen, bgreen,complex = complex, alg=alg)
 
     if pathtosavetxt != '':
         save_rec_as_txt(pathtosavetxt + 'ImmFouRed.txt', signalRed)
         save_rec_as_txt(pathtosavetxt + 'ImmFouGreen.txt', signalGreen)
         save_rec_as_txt(pathtosavetxt+ 'ImmFouBlue.txt', signalBlue)
 
-    if fft: 
+    if Fou: 
         imageGreen = ifft(signalGreen).real
-        imageGreen = np.reshape(imageGreen, (width,height))
+        imageGreen = np.reshape(imageGreen, (height,width))
 
         imageRed = ifft(signalRed).real
-        imageRed = np.reshape(imageRed, (width,height))
+        imageRed = np.reshape(imageRed, (height,width))
 
         imageBlue = ifft(signalBlue).real
-        imageBlue = np.reshape(imageBlue, (width,height))
+        imageBlue = np.reshape(imageBlue, (height,width))
         recImage = np.stack((imageRed.astype('uint8'), imageGreen.astype('uint8'), imageBlue.astype('uint8')), axis=2)
     else:
-        imageGreen = np.reshape(signalGreen, (width,height))
-        imageRed = np.reshape(signalRed, (width,height))
-        imageBlue = np.reshape(signalBlue, (width,height))
+        imageGreen = np.reshape(signalGreen, (height,width))
+        imageRed = np.reshape(signalRed, (height,width))
+        imageBlue = np.reshape(signalBlue, (height,width))
         recImage = np.stack((imageRed.astype('uint8'), imageGreen.astype('uint8'), imageBlue.astype('uint8')), axis=2)
         
-    plt.imsave(pathtosavetxt, recImage)
+    plt.imsave(pathtosavetxt + '/rec' + str(c) + '.jpg', recImage)
     print('Done')
 
 def main(): 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--path-to-image", type=str,  help="path to image")
+    parser.add_argument("--path", type=str,  help="path to image")
     parser.add_argument("--c", type=float, help="constant for measurements")
     parser.add_argument("--lamdathr", type=int, help="level below which we consider zero")
     parser.add_argument("--Fou", type=bool, default = True, help="apply Fast Fourier transform and recover in Fourier domain")
-    parser.add_argument("--path-to-txt", type = str, default = '', help="path to save the reconstructed image")
+    parser.add_argument("--ncore", type=int, default=1,  help="number of core")
+    parser.add_argument("--pathtotxt", type = str, default = '', help="path to save the reconstructed image")
     parser.add_argument("--varepsilon", type=float, default = 0.01, help="accuracy 1 - varepsilon")
     parser.add_argument("--alg", type=bool, default= "ECOS", help="algorithm for l1 minimization")
     parser.add_argument("--complex", type=bool, default=True, help="work in complex vector space")
 
     args = parser.parse_args()
 
-    FourierRecoverRGB(imagepath = args.path_to_image, c = args.c, lamda = args.lamdathr, Fou = args.Fou, pathtosavetxt = args.path-to-txt, varepsilon= args.varepsilon, alg = args.alg, complex = args.complex)
+    FourierRecoverRGB(imagepath = args.path, c = args.c, ncore = args.ncore, lamdathr = args.lamdathr, Fou = args.Fou, pathtosavetxt = args.pathtotxt, varepsilon= args.varepsilon, alg = args.alg, complex = args.complex)
 
-main()
+if __name__ == '__main__':
+    main()

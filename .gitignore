@@ -1,0 +1,12 @@
+*.jpg
+*.png
+*.wav
+*.pyc
+*.cpython.pyc
+*.pyo
+utils/MeasurementsConstruction/GaussianRandomMatrix/__pycache__/GaussianRandomMatrix.cpython-36.pyc
+utils/optimizers/__pycache__/optimizersLI.cpython-36.pyc
+utils/scripts/__pycache__/audio_plots.cpython-36.pyc
+utils/scripts/__pycache__/save_rec_as_txt.cpython-36.pyc
+AudioRecovery/GaussianAudioRec/Untitled.ipynb
+AudioRecovery/GaussianAudioRec/.ipynb_checkpoints/Untitled-checkpoint.ipynb

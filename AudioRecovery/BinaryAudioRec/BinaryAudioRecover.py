@@ -38,23 +38,23 @@ def BinaryAudioRecover(path, sr,  c, lamdathr, Fou, p=0.5, varepsilon=0.01, path
         b = A.dot(y)
         bsave = ifft(b)
         if pathtosavetxt != '': 
-            scipy.io.wavfile.write(pathtosavetxt +'signalmeas.wav', sr, bsave.real*100)
+            scipy.io.wavfile.write(pathtosavetxt +'signalmeas' + str(c)+'.waw', sr, bsave.real*100)
     else: 
         b = A.dot(x)
         if pathtosavetxt != '': 
-            scipy.io.wavfile.write(pathtosavetxt +'signalmeas.wav', sr, b.real*100)
+            scipy.io.wavfile.write(pathtosavetxt +'signalmeas' + str(c) + '.waw', sr, b.real*100)
 
     signal = optimizerLI(n, A, b,complex = complex, alg=alg)
     sign = ifft(signal)
 
     if pathtosavetxt != '':
         save_rec_as_txt(pathtosavetxt + 'audioBinRec.txt', sign)
-        scipy.io.wavfile.write(pathtosavetxt +'rec.wav', sr, np.array(sign).real*100)
-        pretty_plot(x, title = 'Original Signal', path=pathtosavetxt + 'Original.jpg')
-        pretty_plot(y, title = 'Original Signal in Fourier Domain', path=pathtosavetxt + 'OriginalInFourier.jpg')
-        pretty_plot(signal, title = 'Reconstructed Signal in Fourier Domain', path=pathtosavetxt + 'RecInFourier.jpg')
-        pretty_plot(sign , title = 'Reconstructed Signal', path=pathtosavetxt + 'Rec.jpg')
-        plot_signals(x, sign, labelx='Original', labely='Recostructed', path=pathtosavetxt + 'RecvsOr.jpg')
+        scipy.io.wavfile.write(pathtosavetxt +'rec.' + str(c) + '.waw', sr, np.array(sign).real*100)
+        pretty_plot(x, title = 'Original Signal', path=pathtosavetxt + 'Original'+ str(c) + '.jpg')
+        pretty_plot(y, title = 'Original Signal in Fourier Domain', path=pathtosavetxt + 'OriginalInFourier' + str(c) + '.jpg')
+        pretty_plot(signal, title = 'Reconstructed Signal in Fourier Domain', path=pathtosavetxt + 'RecInFourier'+ str(c) + '.jpg')
+        pretty_plot(sign , title = 'Reconstructed Signal', path=pathtosavetxt + 'Rec'+ str(c) + '.jpg')
+        plot_signals(x, sign, labelx='Original', labely='Recostructed', path=pathtosavetxt + 'RecvsOr' + str(c) + '.jpg')
 
     print('Done!')
 
@@ -75,4 +75,5 @@ def main():
 
     BinaryAudioRecover(path = args.path, sr = args.sr, p = args.p, c = args.c, lamdathr = args.lamdathr, Fou = args.Fou, pathtosavetxt = args.path_to_txt, varepsilon= args.varepsilon, alg = args.alg, complex = args.complex)
 
-main()
+if __name__ == '__main__':
+    main()
