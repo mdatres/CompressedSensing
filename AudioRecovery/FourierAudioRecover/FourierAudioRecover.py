@@ -5,6 +5,9 @@ import cmath as math
 from scipy.fft import fft, ifft
 import os
 import matplotlib
+if os.environ.get('DISPLAY','') == '':
+    print('no display found. Using non-interactive Agg backend')
+    matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import cvxpy as cvx
 import argparse
@@ -18,9 +21,6 @@ from utils.optimizers.optimizersLI import optimizerLI
 from utils.scripts.save_rec_as_txt import save_rec_as_txt
 from utils.scripts.audio_plots import pretty_plot, plot_signals
 
-if os.environ.get('DISPLAY','') == '':
-    print('no display found. Using non-interactive Agg backend')
-    matplotlib.use('Agg')
     
 def FourierAudioRecover(path, sr, c, lamdathr, Fou,  varepsilon=0.01, pathtosavetxt='', alg="ECOS_BB", complex=True):
     x, sr = librosa.load(path, sr= sr)
@@ -30,7 +30,6 @@ def FourierAudioRecover(path, sr, c, lamdathr, Fou,  varepsilon=0.01, pathtosave
     if Fou:
         lamda=0
         y = fft(x)
-        plt.plot(y)
         lamda =(y > lamdathr).sum()
         print('The sparsity level is:   '+ str(lamda))
     else:
@@ -60,8 +59,8 @@ def FourierAudioRecover(path, sr, c, lamdathr, Fou,  varepsilon=0.01, pathtosave
         pretty_plot(y, title = 'Original Signal in Fourier Domain', path=pathtosavetxt + 'OriginalInFourier'+ str(c) + '.jpg')
         pretty_plot(signal, title = 'Reconstructed Signal in Fourier Domain', path=pathtosavetxt + 'RecInFourier'+ str(c) + '.jpg')
         pretty_plot(sign , title = 'Reconstructed Signal', path=pathtosavetxt + 'Rec'+ str(c) + '.jpg')
-        plot_signals(x, sign, labelx='Original', labely='Recostructed', path=pathtosavetxt + 'RecvsOr'+ str(c) + '.jpg')
-
+        plot_signals(x, sign, labelx='Original', labely='Recostructed', path=pathtosavetxt + 'RecvsOr'+ str(c) + '.jpg', c='c = '+str(c))
+        
 def main(): 
     parser = argparse.ArgumentParser()
     parser.add_argument("--path", type=str,  help="path to image")

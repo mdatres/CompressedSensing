@@ -1,5 +1,9 @@
 from PIL import Image
+import os
 import matplotlib
+if os.environ.get('DISPLAY','') == '':
+    print('no display found. Using non-interactive Agg backend')
+    matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np 
 import csv
@@ -17,11 +21,8 @@ from utils.scripts.save_rec_as_txt import save_rec_as_txt
 from utils.MeasurementsConstruction.BinaryRandomMatrix.BinaryRandomMatrix import BinaryRandomMatrix
 from utils.optimizers.optimizersLI import optimizerLI
 
-if os.environ.get('DISPLAY','') == '':
-    print('no display found. Using non-interactive Agg backend')
-    matplotlib.use('Agg')
 
-def BinaryRecoverRGB(imagepath, c, lamdathr, ncore = 1, Fou=True, p=0.5, varepsilon=0.01, pathtosavetxt='', alg="ECOS_BB", complex=True):
+def BinaryRecoverRGB(imagepath, c, lamdathr, ncore = 1, Fou=True, varepsilon=0.01, pathtosavetxt='', alg="ECOS_BB", p=0.5, complex=True):
 
     x = Image.open(imagepath).convert('RGB')
     width = x.size[0]

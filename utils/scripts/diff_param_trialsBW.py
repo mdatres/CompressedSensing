@@ -20,55 +20,34 @@ sys.path.append("../..")
 # Import from my script 
 
     
-from utils.MeasurementsConstruction.GaussianRandomMatrix.RGBGaussianRandomMatrix import RGBGaussianRandomMatrix
-from utils.MeasurementsConstruction.FourierRandomMatrix.RGBFourierRandomMatrix import RGBFourierRandomMatrix
-from utils.MeasurementsConstruction.BinaryRandomMatrix.RGBBinaryRandomMatrix import RGBBinaryRandomMatrix
-from RGBRecovery.BinaryRecovery.BinaryRecoverRGB import BinaryRecoverRGB
-from RGBRecovery.FourierRec.FourierRecoverRGB import FourierRecoverRGB
-from RGBRecovery.GaussianRecovery.GaussianRecoverRGB import GaussianRecoverRGB
+from BWRecovery.BinaryRecovery.BinaryRecoverBW import BinaryRecoverBW
+from BWRecovery.FourierRec.FourierRecoverBW import FourierRecoverBW
+from BWRecovery.GaussianRecovery.GaussianRecoverBW import GaussianRecoverBW
 from utils.scripts.save_rec_as_txt import save_rec_as_txt
 from utils.MeasurementsConstruction.GaussianRandomMatrix.GaussianRandomMatrix import GaussianRandomMatrix
 from utils.MeasurementsConstruction.BinaryRandomMatrix.BinaryRandomMatrix import BinaryRandomMatrix
 from utils.MeasurementsConstruction.FourierRandomMatrix.FourierRandomMatrix import FourierRandomMatrix
 from utils.optimizers.optimizersLI import optimizerLI
 
-class NoDaemonProcess(multiprocessing.Process):
-    @property
-    def daemon(self):
-        return False
 
-    @daemon.setter
-    def daemon(self, value):
-        pass
-
-
-class NoDaemonContext(type(multiprocessing.get_context())):
-    Process = NoDaemonProcess
-
-
-class MyPool(multiprocessing.pool.Pool):
-    def __init__(self, *args, **kwargs):
-        kwargs['context'] = NoDaemonContext()
-        super(MyPool, self).__init__(*args, **kwargs)
-
-def different_trialsRGB(path, type, stop, cvalues, lamdathr, Fou=True,ncorechannels=1, ncore=1, varepsilon=0.01, pathtosavetxt='', alg="ECOS_BB", complex=True): 
+def different_trialsBW(path, type, stop, cvalues, lamdathr, Fou=True, ncore=1, varepsilon=0.01, pathtosavetxt='', alg="ECOS_BB", complex=True): 
 
     cs = np.linspace(0.5, stop, cvalues)
     params = []
     for c in cs:
-        params.append((path, c, lamdathr, Fou, ncorechannels, varepsilon, pathtosavetxt, alg, complex))
+        params.append((path, c, lamdathr, Fou, varepsilon, pathtosavetxt, alg, complex))
 
     if type == 'Fourier':
-        pool = MyPool(ncore)
-        pool.starmap(FourierRecoverRGB, params)
+        pool = Pool(ncore)
+        pool.starmap(FourierRecoverBW, params)
     
     if type == 'Binary':
-        pool = MyPool(ncore)
-        pool.starmap(BinaryRecoverRGB, params)
+        pool = Pool(ncore)
+        pool.starmap(BinaryRecoverBW, params)
 
     if type == 'Gaussian':
-        pool = MyPool(ncore)
-        pool.starmap(GaussianRecoverRGB, params)
+        pool = Pool(ncore)
+        pool.starmap(GaussianRecoverBW, params)
 
 def main(): 
     parser = argparse.ArgumentParser()
@@ -78,7 +57,6 @@ def main():
     parser.add_argument("--cvalues", type=int, help="number of trials to prove")
     parser.add_argument("--lamdathr", type=int, help="level below which we consider zero")
     parser.add_argument("--Fou", type=bool, default = True, help="apply Fast Fourier transform and recover in Fourier domain")
-    parser.add_argument("--ncorechannels", type=int, default=1, help="number of cores inside a type of reconstruction")
     parser.add_argument("--ncore", type=int, default=1, help="number of cores")
     parser.add_argument("--pathtotxt", type = str, default = '', help="path to save the reconstructed image")
     parser.add_argument("--varepsilon", type=float, default = 0.01, help="accuracy 1 - varepsilon")
@@ -87,6 +65,6 @@ def main():
 
     args = parser.parse_args()
 
-    different_trialsRGB(path = args.path, type = args.type, stop = args.stop, cvalues = args.cvalues, ncore = args.ncore, lamdathr = args.lamdathr, ncorechannels = args.ncorechannels, Fou = args.Fou, pathtosavetxt = args.pathtotxt, varepsilon= args.varepsilon, alg = args.alg, complex = args.complex)
+    different_trialsBW(path = args.path, type = args.type, stop = args.stop, cvalues = args.cvalues, ncore = args.ncore, lamdathr = args.lamdathr, Fou = args.Fou, pathtosavetxt = args.pathtotxt, varepsilon= args.varepsilon, alg = args.alg, complex = args.complex)
 
 main()

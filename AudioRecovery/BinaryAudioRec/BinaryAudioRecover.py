@@ -5,6 +5,9 @@ import cmath as math
 from scipy.fft import fft, ifft
 import os
 import matplotlib
+if os.environ.get('DISPLAY','') == '':
+    print('no display found. Using non-interactive Agg backend')
+    matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import cvxpy as cvx
 import argparse
@@ -19,11 +22,8 @@ from utils.scripts.audio_plots import pretty_plot, plot_signals
 
 
 
-if os.environ.get('DISPLAY','') == '':
-    print('no display found. Using non-interactive Agg backend')
-    matplotlib.use('Agg')
     
-def BinaryAudioRecover(path, sr,  c, lamdathr, Fou, p=0.5, varepsilon=0.01, pathtosavetxt='', alg="ECOS", complex=True):
+def BinaryAudioRecover(path, sr,  c, lamdathr, Fou, varepsilon=0.01, pathtosavetxt='', alg="ECOS", complex=True, p=0.5):
     x, sr = librosa.load(path, sr= sr)
     n = len(x)
     print('The lenght of the signal is:     ' + str(n))

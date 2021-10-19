@@ -1,9 +1,13 @@
 import librosa
 import soundfile as sf
 import numpy as np
+import os
 import cmath as math
 from scipy.fft import fft, ifft
 import matplotlib
+if os.environ.get('DISPLAY','') == '':
+    print('no display found. Using non-interactive Agg backend')
+    matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import cvxpy as cvx
 import argparse
@@ -15,11 +19,8 @@ from utils.optimizers.optimizersLI import optimizerLI
 from utils.scripts.save_rec_as_txt import save_rec_as_txt
 from utils.scripts.audio_plots import pretty_plot, plot_signals
 
-import os
 
-if os.environ.get('DISPLAY','') == '':
-    print('no display found. Using non-interactive Agg backend')
-    matplotlib.use('Agg')
+
 
 def GaussianAudioRecover(path, sr,  c, lamdathr, Fou, varepsilon=0.01, pathtosavetxt='', alg="ECOS_BB", complex=True):
     x, sr = librosa.load(path, sr= sr)

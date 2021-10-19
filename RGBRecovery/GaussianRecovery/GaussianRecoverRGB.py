@@ -1,5 +1,9 @@
 from PIL import Image
+import os
 import matplotlib
+if os.environ.get('DISPLAY','') == '':
+    print('no display found. Using non-interactive Agg backend')
+    matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np 
 import csv
@@ -82,18 +86,18 @@ def GaussianRecoverRGB(imagepath, c, lamdathr, Fou,  ncore=1, varepsilon=0.01, p
 
     if Fou: 
         imageGreen = ifft(signalGreen).real
-        imageGreen = np.reshape(imageGreen, (width,height))
+        imageGreen = np.reshape(imageGreen, (height,width))
 
         imageRed = ifft(signalRed).real
-        imageRed = np.reshape(imageRed, (width,height))
+        imageRed = np.reshape(imageRed, (height,width))
 
         imageBlue = ifft(signalBlue).real
-        imageBlue = np.reshape(imageBlue, (width,height))
+        imageBlue = np.reshape(imageBlue, (height,width))
         recImage = np.stack((imageRed.astype('uint8'), imageGreen.astype('uint8'), imageBlue.astype('uint8')), axis=2)
     else:
-        imageGreen = np.reshape(signalGreen, (width,height))
-        imageRed = np.reshape(signalRed, (width,height))
-        imageBlue = np.reshape(signalBlue, (width,height))
+        imageGreen = np.reshape(signalGreen, (height, width))
+        imageRed = np.reshape(signalRed, (height, width))
+        imageBlue = np.reshape(signalBlue, (height, width))
         recImage = np.stack((imageRed.astype('uint8'), imageGreen.astype('uint8'), imageBlue.astype('uint8')), axis=2)
     
     plt.imsave(pathtosavetxt + 'rec' + str(c) + '.jpg', recImage)
